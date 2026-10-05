@@ -1,0 +1,16 @@
+# 系统与编辑器冗余文件
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*~
+
+# 日志与临时文件
+*.log
+*.tmp
+
+# 依赖与构建产物
+node_modules/
+dist/
+.vscode/
+.idea/
