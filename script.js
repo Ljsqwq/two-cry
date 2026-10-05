@@ -4,6 +4,9 @@
   var SCAN_MS = 2400;
   var COUNT_MS = 1100;
   var DOT_COUNT = 36;
+  var JITTER = 6;
+  // < 1 让基准分偏正向：告白场景下均值落在 70 上下，低分稀有但不为零
+  var CURVE = 0.4;
 
   var body = document.body;
   var form = document.querySelector('[data-form]');
@@ -41,14 +44,28 @@
     return list[Math.floor(Math.random() * list.length)];
   }
 
-  function resonanceOf(mine, partner) {
+  function baseResonance(mine, partner) {
     var key = [mine, partner].sort().join('\u0000');
     var hash = 2166136261;
     for (var i = 0; i < key.length; i++) {
       hash ^= key.charCodeAt(i);
       hash = Math.imul(hash, 16777619);
     }
-    return ((hash >>> 0) % 10000) / 100;
+    var unit = (hash >>> 0) / 4294967296;
+    return Math.pow(unit, CURVE) * 100;
+  }
+
+  function resonanceOf(mine, partner) {
+    var base = baseResonance(mine, partner);
+    var jitter = (Math.random() * 2 - 1) * JITTER;
+    var score = base + jitter;
+    if (score < 0.5) {
+      score = 0.5;
+    }
+    if (score > 99.9) {
+      score = 99.9;
+    }
+    return Math.round(score * 100) / 100;
   }
 
   function clearTimers() {
